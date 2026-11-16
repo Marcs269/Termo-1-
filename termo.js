@@ -15,10 +15,11 @@ let segredo = "";
 let rodada = 0;
 let qtdLetras = 5;
 let tentativas = [];
+const maxRodadas = 5;
 
 function iniciar() {
     const posicao = Math.floor(Math.random() * palavrasEducacao.length);
-    segredo = palavrasEducacao[posicao];
+    segredo = palavrasEducacao[posicao].toUpperCase();
     rodada = 0;
     tentativas = [];
 
@@ -39,15 +40,30 @@ function atualizarLetrasUtilizadas() {
     const conjunto = new Set();
 
     tentativas.forEach((tentativa) => {
-        for (const letra of tentativa) {
+        Array.from(tentativa).forEach((letra) => {
             if (letra && !conjunto.has(letra)) {
                 conjunto.add(letra);
                 letras.push(letra);
             }
-        }
+        });
     });
 
-    letrasUtilizadas.textContent = letras.join(" ") || "Nenhuma";
+    letrasUtilizadas.textContent = letras.length ? letras.join(" ") : "Nenhuma";
+}
+
+function setEstadoLetra(input, estado) {
+    if (!input) return;
+
+    const mapa = {
+        correta: "green",
+        presente: "yellow",
+        errada: "gray"
+    };
+
+    input.style.backgroundColor = mapa[estado] || "gray";
+    input.style.color = "#123";
+    input.style.fontWeight = "700";
+    input.setAttribute("data-estado", estado);
 }
 
 function verificar() {
@@ -55,27 +71,56 @@ function verificar() {
     if (!form) return;
 
     let tentativa = "";
+    const letrasUsadas = new Set();
 
     for (let i = 0; i < qtdLetras; i++) {
         const input = form["letra" + i];
         if (!input) continue;
 
         const caixa = input.value.trim().toUpperCase();
-
         if (!caixa) {
             input.focus();
             return;
         }
 
+        letrasUsadas.add(caixa);
+        tentativa += caixa;
+    }
+
+    const letrasCorretas = new Set();
+    const letrasPresentes = new Set();
+
+    for (let i = 0; i < qtdLetras; i++) {
+        const caixa = tentativa[i];
+        const input = form["letra" + i];
+
+        if (!input) continue;
+
         if (caixa === segredo[i]) {
-            input.style.backgroundColor = "green";
-        } else if (segredo.includes(caixa)) {
-            input.style.backgroundColor = "yellow";
-        } else {
-            input.style.backgroundColor = "gray";
+            setEstadoLetra(input, "correta");
+            letrasCorretas.add(caixa);
+        }
+    }
+
+    for (let i = 0; i < qtdLetras; i++) {
+        const caixa = tentativa[i];
+        const input = form["letra" + i];
+        if (!input) continue;
+
+        if (input.getAttribute("data-estado") === "correta") {
+            continue;
         }
 
-        tentativa += caixa;
+        if (segredo.includes(caixa)) {
+            if (!letrasCorretas.has(caixa) && !letrasPresentes.has(caixa)) {
+                setEstadoLetra(input, "presente");
+                letrasPresentes.add(caixa);
+            } else {
+                setEstadoLetra(input, "errada");
+            }
+        } else {
+            setEstadoLetra(input, "errada");
+        }
     }
 
     tentativas.push(tentativa);
@@ -88,10 +133,10 @@ function verificar() {
 
     rodada++;
 
-    if (rodada < 5) {
+    if (rodada < maxRodadas) {
         criarFormulario();
     } else {
-        alert("Fim de Jogo! A palavra era: " + segredo);
+        alert("Fim de jogo! A palavra era: " + segredo);
     }
 }
 
@@ -114,6 +159,15 @@ function criarFormulario() {
         caixa.autocomplete = "off";
         caixa.inputMode = "text";
         caixa.setAttribute("aria-label", "Letra " + (i + 1));
+        caixa.value = "";
+        caixa.style.textTransform = "uppercase";
+        caixa.addEventListener("input", () => {
+            caixa.value = caixa.value.toUpperCase().replace(/[^A-ZÀ-Ú]/g, "");
+            if (caixa.value && i < qtdLetras - 1) {
+                const proximo = formulario["letra" + (i + 1)];
+                if (proximo) proximo.focus();
+            }
+        });
         formulario.appendChild(caixa);
     }
 
