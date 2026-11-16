@@ -9,61 +9,80 @@
     <style>
         :root {
             color-scheme: light;
-            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+            font-family: "Segoe UI", "Trebuchet MS", sans-serif;
             color: #15506b;
-            background: #75d7f0;
+            background: #8bdcf5;
         }
 
         * { box-sizing: border-box; }
 
+        html, body {
+            margin: 0;
+            min-height: 100%;
+            height: 100%;
+        }
+
         body {
             min-height: 100vh;
-            margin: 0;
-            padding: 48px 20px;
+            padding: 42px 20px;
             overflow-x: hidden;
-            background:
-                radial-gradient(ellipse at 14% 20%, rgba(255,255,255,.92) 0 3%, transparent 3.4%),
-                radial-gradient(ellipse at 86% 28%, rgba(255,255,255,.75) 0 2%, transparent 2.5%),
-                linear-gradient(180deg, #5bc9ed 0%, #b8eff7 56%, #e8fff3 100%);
             position: relative;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.25), rgba(255,255,255,0.02)),
+                linear-gradient(135deg, #7ac8ea 0%, #a7dff5 18%, #d7f1fb 42%, #b7dff2 56%, #7eb9da 100%);
         }
 
         body::before,
         body::after {
             content: "";
             position: fixed;
-            z-index: 0;
+            inset: 0;
             pointer-events: none;
-            border-radius: 50%;
-            background: linear-gradient(145deg, rgba(255,255,255,.75), rgba(255,255,255,.08));
-            border: 1px solid rgba(255,255,255,.65);
-            box-shadow: inset -10px -14px 24px rgba(34,158,195,.12), 0 10px 24px rgba(19,132,171,.12);
         }
 
-        body::before { width: 120px; height: 120px; top: 12%; left: 7%; }
-        body::after { width: 70px; height: 70px; right: 9%; bottom: 14%; }
+        body::before {
+            background:
+                radial-gradient(circle at 15% 23%, rgba(255,255,255,0.92) 0 14%, transparent 15%),
+                radial-gradient(circle at 43% 32%, rgba(255,255,255,0.75) 0 11%, transparent 12%),
+                radial-gradient(circle at 72% 18%, rgba(255,255,255,0.7) 0 9%, transparent 10%),
+                radial-gradient(circle at 85% 42%, rgba(255,255,255,0.58) 0 11%, transparent 12%),
+                linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0));
+            opacity: 0.9;
+        }
+
+        body::after {
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.05), rgba(18,95,133,0.06)),
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0.04),
+                    rgba(255,255,255,0.04) 1px,
+                    transparent 1px,
+                    transparent 6px
+                );
+            mix-blend-mode: screen;
+            opacity: 0.8;
+        }
 
         .page {
-            width: min(100%, 620px);
+            width: min(100%, 700px);
             margin: 0 auto;
             position: relative;
             z-index: 1;
         }
 
-        /* Moldura Aero com borda azul-cinza e reflexo de vidro no topo. */
         .game-card {
             position: relative;
             overflow: hidden;
-            padding: clamp(24px, 6vw, 48px);
-            border: 1px solid rgba(255,255,255,.96);
+            padding: 0 18px 26px;
+            border: 1px solid rgba(255,255,255,0.92);
             border-radius: 18px;
-            background:
-                linear-gradient(180deg, rgba(255,255,255,.94) 0%, rgba(239,250,255,.91) 16%, rgba(218,239,250,.88) 100%);
+            background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(214,239,247,0.88));
             box-shadow:
-                0 0 0 1px rgba(70,133,164,.48),
-                0 4px 0 rgba(255,255,255,.72) inset,
-                0 22px 55px rgba(20,83,117,.32),
-                0 3px 12px rgba(31,111,147,.18);
+                0 0 0 1px rgba(84,135,167,0.5),
+                0 16px 38px rgba(27,102,136,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.9),
+                inset 0 -5px 18px rgba(111,162,189,0.12);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
         }
@@ -71,190 +90,280 @@
         .game-card::before {
             content: "";
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 84px;
-            border-bottom: 1px solid rgba(116,171,197,.3);
-            background: linear-gradient(180deg, rgba(255,255,255,.86), rgba(221,243,252,.38) 70%, rgba(255,255,255,0));
+            inset: 0 0 auto 0;
+            height: 88px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(196,227,240,0.12));
+            border-bottom: 1px solid rgba(123,175,206,0.35);
             pointer-events: none;
         }
 
-        .brand { position: relative; text-align: center; margin-bottom: 30px; }
+        .window-header {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 42px;
+            padding: 10px 8px 8px;
+            border-bottom: 1px solid rgba(136,176,200,0.4);
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .window-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid rgba(103,103,103,0.35);
+            display: inline-block;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+        }
+
+        .window-button.close { background: linear-gradient(180deg, #ffb7b7, #ff8a8a); }
+        .window-button.minimize { background: linear-gradient(180deg, #f8d985, #f6c76c); }
+        .window-button.maximize { background: linear-gradient(180deg, #9ae7a5, #6ac778); }
+
+        .window-title {
+            flex: 1;
+            text-align: center;
+            padding-right: 56px;
+            color: #567e92;
+            font-size: 0.82rem;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .brand {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding-top: 18px;
+            margin-bottom: 24px;
+        }
+
         .badge {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
-            padding: 7px 13px;
-            border: 1px solid rgba(255,255,255,.98);
-            border-radius: 7px;
-            color: #285d78;
-            background: linear-gradient(180deg, #fff 0%, #e5f4fb 48%, #c9e4f1 100%);
-            box-shadow: 0 1px 0 rgba(87,139,164,.45), inset 0 1px 0 #fff, 0 3px 7px rgba(40,105,135,.13);
-            font-size: .75rem;
+            gap: 8px;
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.96);
+            background: linear-gradient(180deg, #f3fbff 0%, #d3f0fa 100%);
+            box-shadow: inset 0 1px 0 #fff, 0 3px 7px rgba(30,105,130,0.12);
+            color: #2c6a84;
+            font-size: 0.72rem;
             font-weight: 700;
-            letter-spacing: .08em;
+            letter-spacing: .1em;
             text-transform: uppercase;
         }
 
         h1 {
-            margin: 14px 0 8px;
-            color: #087ba5;
-            background: linear-gradient(180deg, #58bce0 0%, #147ca9 52%, #075578 100%);
+            margin: 16px 0 8px;
+            font-size: clamp(2.7rem, 10vw, 4.8rem);
+            line-height: 0.9;
+            letter-spacing: -0.08em;
+            color: #0c7aa5;
+            background: linear-gradient(180deg, #6dd0f0 0%, #1e8dc2 42%, #0d5c87 100%);
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-size: clamp(2.6rem, 11vw, 4.5rem);
-            line-height: .95;
-            letter-spacing: -.07em;
-            filter: drop-shadow(0 2px 0 rgba(255,255,255,.95)) drop-shadow(0 4px 2px rgba(21,101,135,.25));
+            text-shadow: 0 2px 0 rgba(255,255,255,0.8), 0 8px 18px rgba(16,97,136,0.18);
         }
 
-        .subtitle { margin: 0; color: #4a7184; font-size: 1rem; text-shadow: 0 1px #fff; }
+        .subtitle {
+            margin: 0;
+            color: #496f82;
+            font-size: 1rem;
+            letter-spacing: .02em;
+        }
 
         .instructions {
             position: relative;
-            margin: 0 auto 25px;
-            max-width: 430px;
+            z-index: 1;
+            max-width: 440px;
+            margin: 0 auto 22px;
             padding: 14px 18px;
-            border: 1px solid rgba(255,255,255,.95);
             border-radius: 10px;
-            background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(222,242,250,.72));
-            box-shadow: inset 0 1px 0 #fff, 0 1px 3px rgba(45,105,132,.13);
+            border: 1px solid rgba(255,255,255,0.92);
+            background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(218,238,247,0.72));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 2px 6px rgba(35,98,127,0.08);
             color: #3d7184;
             text-align: center;
-            line-height: 1.55;
+            font-size: 0.96rem;
+            line-height: 1.5;
         }
 
-        #jogo { display: grid; gap: 12px; }
+        #jogo {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            gap: 12px;
+        }
+
         #jogo form {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: clamp(5px, 2vw, 11px);
+            gap: clamp(6px, 2vw, 12px);
             flex-wrap: wrap;
-            padding: 12px;
-            border: 1px solid rgba(255,255,255,.86);
+            padding: 12px 10px;
             border-radius: 12px;
-            background: linear-gradient(180deg, rgba(198,225,238,.46), rgba(255,255,255,.56));
-            box-shadow: inset 0 1px 4px rgba(42,112,143,.12), 0 1px 0 rgba(255,255,255,.9);
+            border: 1px solid rgba(255,255,255,0.94);
+            background: linear-gradient(180deg, rgba(198,225,238,0.38), rgba(255,255,255,0.58));
+            box-shadow: inset 0 1px 4px rgba(42,112,143,0.12), 0 1px 0 rgba(255,255,255,0.88);
         }
 
-        /* Tiles prateados e brilhantes, inspirados nos ícones do Windows Vista. */
         #jogo input[type="text"] {
             width: clamp(42px, 12vw, 58px);
             height: clamp(48px, 13vw, 64px);
-            border: 1px solid rgba(255,255,255,.96);
-            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.96);
+            border-radius: 14px;
             outline: none;
             background:
-                linear-gradient(155deg, rgba(255,255,255,.82) 0%, rgba(255,255,255,.18) 42%, transparent 43%),
-                linear-gradient(180deg, #d9e0e5 0%, #aeb9c1 48%, #8e9ba5 100%);
+                linear-gradient(155deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.18) 42%, transparent 43%),
+                linear-gradient(180deg, #dfe5ea 0%, #aab7bf 46%, #949ea6 100%);
             box-shadow:
-                0 5px 10px rgba(28,126,157,.16),
-                inset 0 2px 3px rgba(255,255,255,.96),
-                inset 0 -3px 5px rgba(75,89,101,.24);
+                0 5px 10px rgba(28,126,157,0.16),
+                inset 0 2px 3px rgba(255,255,255,0.96),
+                inset 0 -3px 5px rgba(75,89,101,0.24);
             color: #234b60;
-            font: 800 1.5rem/1 "Trebuchet MS", "Segoe UI", sans-serif;
+            font: 800 1.5rem/1 "Segoe UI", "Trebuchet MS", sans-serif;
             text-align: center;
             text-transform: uppercase;
-            text-shadow: 0 1px 0 rgba(255,255,255,.72);
-            transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.72);
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
         }
 
         #jogo input[type="text"]:focus {
             transform: translateY(-2px);
             border-color: #fff;
             box-shadow:
-                0 0 0 4px rgba(52,185,216,.2),
-                0 7px 14px rgba(28,126,157,.18),
-                inset 0 2px 3px rgba(255,255,255,.98),
-                inset 0 -3px 5px rgba(75,89,101,.2);
+                0 0 0 4px rgba(52,185,216,0.18),
+                0 7px 14px rgba(28,126,157,0.16),
+                inset 0 2px 3px rgba(255,255,255,0.98),
+                inset 0 -3px 5px rgba(75,89,101,0.2);
         }
 
-        /* Feedback do jogo com acabamento metálico para cada resultado. */
-        #jogo input[type="text"][style*="green"],
-        #jogo input[type="text"][style*="green"]:focus {
-            border-color: rgba(255,255,255,.98);
+        #jogo input[type="text"][data-estado="correta"],
+        #jogo input[type="text"][data-estado="correta"]:focus {
+            border-color: rgba(255,255,255,0.98);
             background:
-                linear-gradient(155deg, rgba(255,255,255,.8) 0%, rgba(255,255,255,.16) 42%, transparent 43%),
-                linear-gradient(180deg, #a9ed9a 0%, #58c96a 48%, #29984e 100%) !important;
-            box-shadow: 0 5px 10px rgba(30,125,65,.2), inset 0 2px 3px rgba(255,255,255,.95), inset 0 -3px 5px rgba(25,92,48,.28);
-            color: #124a2a;
+                linear-gradient(155deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.16) 42%, transparent 43%),
+                linear-gradient(180deg, #b0e9a9 0%, #66cf73 48%, #2ea957 100%) !important;
+            box-shadow: 0 5px 12px rgba(27,123,63,0.2), inset 0 2px 3px rgba(255,255,255,0.95), inset 0 -3px 5px rgba(26,92,47,0.26);
+            color: #123d25;
         }
 
-        #jogo input[type="text"][style*="yellow"],
-        #jogo input[type="text"][style*="yellow"]:focus {
-            border-color: rgba(255,255,255,.98);
+        #jogo input[type="text"][data-estado="presente"],
+        #jogo input[type="text"][data-estado="presente"]:focus {
+            border-color: rgba(255,255,255,0.98);
             background:
-                linear-gradient(155deg, rgba(255,255,255,.84) 0%, rgba(255,255,255,.18) 42%, transparent 43%),
-                linear-gradient(180deg, #fff2a6 0%, #f6d54d 48%, #d9a921 100%) !important;
-            box-shadow: 0 5px 10px rgba(157,122,22,.2), inset 0 2px 3px rgba(255,255,255,.95), inset 0 -3px 5px rgba(128,91,12,.25);
-            color: #60470d;
+                linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.18) 42%, transparent 43%),
+                linear-gradient(180deg, #fff8b9 0%, #f3d75f 48%, #d3a821 100%) !important;
+            box-shadow: 0 5px 12px rgba(152,124,22,0.2), inset 0 2px 3px rgba(255,255,255,0.95), inset 0 -3px 5px rgba(120,94,16,0.24);
+            color: #5f4702;
         }
 
-        /* O jogo marca as letras incorretas como gray; a apresentação é vermelha. */
-        #jogo input[type="text"][style*="gray"],
-        #jogo input[type="text"][style*="gray"]:focus {
-            border-color: rgba(255,255,255,.98);
+        #jogo input[type="text"][data-estado="errada"],
+        #jogo input[type="text"][data-estado="errada"]:focus {
+            border-color: rgba(255,255,255,0.98);
             background:
-                linear-gradient(155deg, rgba(255,255,255,.8) 0%, rgba(255,255,255,.16) 42%, transparent 43%),
-                linear-gradient(180deg, #f3a0a0 0%, #df6268 48%, #b93848 100%) !important;
-            box-shadow: 0 5px 10px rgba(157,48,57,.2), inset 0 2px 3px rgba(255,255,255,.95), inset 0 -3px 5px rgba(119,31,43,.27);
-            color: #641f2a;
+                linear-gradient(155deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.16) 42%, transparent 43%),
+                linear-gradient(180deg, #f4a7a7 0%, #e66e76 48%, #b73848 100%) !important;
+            box-shadow: 0 5px 12px rgba(157,48,57,0.2), inset 0 2px 3px rgba(255,255,255,0.95), inset 0 -3px 5px rgba(119,31,43,0.27);
+            color: #621d2f;
         }
 
-        #jogo input[type="submit"] {
+        #jogo button[type="submit"] {
             min-height: 48px;
             padding: 0 20px;
-            border: 1px solid #fff;
-            border-radius: 7px;
-            background: linear-gradient(180deg, #9be96b 0%, #55c944 48%, #2cae48 100%);
-            box-shadow: 0 2px 0 #208d42, 0 4px 9px rgba(41,143,67,.2), inset 0 2px 0 rgba(255,255,255,.8);
+            border: 1px solid rgba(255,255,255,0.92);
+            border-radius: 8px;
+            background: linear-gradient(180deg, #a5ec6c 0%, #63d155 48%, #35b349 100%);
+            box-shadow: 0 2px 0 #248c42, 0 5px 10px rgba(38,126,59,0.18), inset 0 1px 0 rgba(255,255,255,0.8);
             color: #fff;
             cursor: pointer;
-            font: 800 .95rem "Trebuchet MS", "Segoe UI", sans-serif;
-            text-shadow: 0 1px 2px rgba(17,106,43,.35);
-            transition: transform .15s ease, filter .15s ease;
+            font: 700 .9rem "Segoe UI", "Trebuchet MS", sans-serif;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            transition: transform .18s ease, filter .18s ease;
         }
 
-        #jogo input[type="submit"]:hover { filter: brightness(1.06); transform: translateY(-2px); }
-        #jogo input[type="submit"]:active { transform: translateY(1px); box-shadow: 0 1px 0 #208d42; }
+        #jogo button[type="submit"]:hover {
+            filter: brightness(1.04);
+            transform: translateY(-1px);
+        }
+
+        #jogo button[type="submit"]:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 0 #248c42;
+        }
 
         .used-letters {
-            margin-top: 26px;
-            padding: 18px 20px;
-            border: 1px solid rgba(255,255,255,.96);
-            border-radius: 11px;
-            background: linear-gradient(180deg, rgba(255,255,255,.84), rgba(211,237,248,.76));
-            box-shadow: inset 0 1px 0 #fff, 0 1px 4px rgba(24,93,123,.14);
+            position: relative;
+            z-index: 1;
+            margin-top: 24px;
+            padding: 16px 18px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.94);
+            background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(214,238,248,0.74));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 2px 7px rgba(26,96,127,0.08);
         }
 
         h2 {
-            margin: 0 0 9px;
+            margin: 0 0 10px;
             color: #14799a;
             font-size: 1rem;
-            letter-spacing: .02em;
+            letter-spacing: .04em;
+            text-transform: uppercase;
         }
 
-        #letrasultilizadas { min-height: 1.5em; color: #3d7184; font-weight: 700; letter-spacing: .18em; overflow-wrap: anywhere; }
-        .footer { margin: 18px 0 0; color: #548496; font-size: .78rem; text-align: center; }
+        #letrasultilizadas {
+            min-height: 1.5em;
+            color: #3d7184;
+            font-weight: 700;
+            letter-spacing: .16em;
+            overflow-wrap: anywhere;
+        }
+
+        .footer {
+            margin-top: 16px;
+            color: #467a8f;
+            text-align: center;
+            font-size: 0.78rem;
+            letter-spacing: .05em;
+        }
 
         @media (max-width: 480px) {
-            body { padding: 24px 14px; }
+            body { padding: 22px 12px; }
             .game-card { border-radius: 14px; }
-            #jogo form { padding: 10px 6px; }
-            #jogo input[type="submit"] { flex-basis: 100%; }
+            .window-header { padding-top: 8px; }
+            .window-title { padding-right: 26px; }
+            #jogo button[type="submit"] { width: 100%; }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+            *, *::before, *::after { transition-duration: .01ms !important; }
         }
     </style>
 </head>
 <body>
     <main class="page">
         <section class="game-card" aria-labelledby="titulo-jogo">
+            <div class="window-header">
+                <div class="window-controls" aria-hidden="true">
+                    <span class="window-button close"></span>
+                    <span class="window-button minimize"></span>
+                    <span class="window-button maximize"></span>
+                </div>
+                <div class="window-title">Termo</div>
+            </div>
+
             <header class="brand">
                 <span class="badge">☀️ Palavra do dia</span>
                 <h1 id="titulo-jogo">TERMO</h1>
@@ -267,11 +376,13 @@
 
             <section class="used-letters" aria-labelledby="titulo-letras">
                 <h2 id="titulo-letras">Letras utilizadas</h2>
-                <div id="letrasultilizadas" aria-live="polite"></div>
+                <div id="letrasultilizadas" aria-live="polite">Nenhuma</div>
             </section>
         </section>
+
         <p class="footer">Respire fundo, pense na palavra e divirta-se ✦</p>
     </main>
+
     <script src="termo.js"></script>
 </body>
 </html>
