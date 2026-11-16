@@ -13,9 +13,9 @@ const palavrasEducacao = [
 
 let segredo = "";
 let rodada = 0;
-let qtdLetras = 5;
-let tentativas = [];
+const qtdLetras = 5;
 const maxRodadas = 5;
+let tentativas = [];
 
 function iniciar() {
     const posicao = Math.floor(Math.random() * palavrasEducacao.length);
@@ -24,105 +24,73 @@ function iniciar() {
     tentativas = [];
 
     const jogo = document.getElementById("jogo");
-    if (jogo) {
-        jogo.innerHTML = "";
-    }
+    if (jogo) jogo.replaceChildren();
 
     atualizarLetrasUtilizadas();
     criarFormulario();
 }
 
 function atualizarLetrasUtilizadas() {
-    const letrasUtilizadas = document.getElementById("letrasutilizadas");
-    if (!letrasUtilizadas) return;
+    const areaLetras = document.getElementById("letrasultilizadas");
+    if (!areaLetras) return;
 
-    const letras = [];
-    const conjunto = new Set();
-
-    tentativas.forEach((tentativa) => {
-        Array.from(tentativa).forEach((letra) => {
-            if (letra && !conjunto.has(letra)) {
-                conjunto.add(letra);
-                letras.push(letra);
-            }
-        });
-    });
-
-    letrasUtilizadas.textContent = letras.length ? letras.join(" ") : "Nenhuma";
+    const letras = [...new Set(tentativas.join(""))];
+    areaLetras.textContent = letras.length ? letras.join(" ") : "Nenhuma";
 }
 
-function setEstadoLetra(input, estado) {
-    if (!input) return;
-
-    const mapa = {
+function definirEstado(input, estado) {
+    const cores = {
         correta: "green",
         presente: "yellow",
         errada: "gray"
     };
-
-    input.style.backgroundColor = mapa[estado] || "gray";
-    input.style.color = "#123";
-    input.style.fontWeight = "700";
-    input.setAttribute("data-estado", estado);
+    input.style.backgroundColor = cores[estado];
+    input.dataset.estado = estado;
 }
 
-function verificar() {
-    const form = document.forms["termo" + rodada];
-    if (!form) return;
+function verificar(formulario) {
+    if (!formulario || formulario.dataset.respondido === "true") return;
 
-    let tentativa = "";
-    const letrasUsadas = new Set();
+    const campos = Array.from(formulario.querySelectorAll('input[type="text"]'));
+    const letras = campos.map((campo) => campo.value.trim().toLocaleUpperCase("pt-BR"));
 
-    for (let i = 0; i < qtdLetras; i++) {
-        const input = form["letra" + i];
-        if (!input) continue;
-
-        const caixa = input.value.trim().toUpperCase();
-        if (!caixa) {
-            input.focus();
-            return;
-        }
-
-        letrasUsadas.add(caixa);
-        tentativa += caixa;
+    const campoVazio = campos.find((campo) => !campo.value.trim());
+    if (campoVazio) {
+        campoVazio.focus();
+        return;
     }
 
-    const letrasCorretas = new Set();
-    const letrasPresentes = new Set();
+    const tentativa = letras.join("");
+    if (tentativa.length !== qtdLetras) return;
+
+    // Impede envios duplicados enquanto esta tentativa é corrigida.
+    formulario.dataset.respondido = "true";
+    campos.forEach((campo) => { campo.disabled = true; });
+    const botao = formulario.querySelector('button[type="submit"]');
+    if (botao) botao.disabled = true;
+
+    // Primeiro marca as letras na posição correta. Depois distribui as ocorrências
+    // restantes da palavra secreta, respeitando letras repetidas como no Termo.
+    const restantes = segredo.split("");
+    const estados = Array(qtdLetras).fill("errada");
 
     for (let i = 0; i < qtdLetras; i++) {
-        const caixa = tentativa[i];
-        const input = form["letra" + i];
-
-        if (!input) continue;
-
-        if (caixa === segredo[i]) {
-            setEstadoLetra(input, "correta");
-            letrasCorretas.add(caixa);
+        if (letras[i] === segredo[i]) {
+            estados[i] = "correta";
+            restantes[i] = null;
         }
     }
 
     for (let i = 0; i < qtdLetras; i++) {
-        const caixa = tentativa[i];
-        const input = form["letra" + i];
-        if (!input) continue;
-
-        if (input.getAttribute("data-estado") === "correta") {
-            continue;
-        }
-
-        if (segredo.includes(caixa)) {
-            if (!letrasCorretas.has(caixa) && !letrasPresentes.has(caixa)) {
-                setEstadoLetra(input, "presente");
-                letrasPresentes.add(caixa);
-            } else {
-                setEstadoLetra(input, "errada");
-            }
-        } else {
-            setEstadoLetra(input, "errada");
+        if (estados[i] === "correta") continue;
+        const indice = restantes.indexOf(letras[i]);
+        if (indice !== -1) {
+            estados[i] = "presente";
+            restantes[indice] = null;
         }
     }
 
+    campos.forEach((campo, i) => definirEstado(campo, estados[i]));
     tentativas.push(tentativa);
     atualizarLetrasUtilizadas();
 
@@ -132,7 +100,6 @@ function verificar() {
     }
 
     rodada++;
-
     if (rodada < maxRodadas) {
         criarFormulario();
     } else {
@@ -146,42 +113,48 @@ function criarFormulario() {
 
     const formulario = document.createElement("form");
     formulario.name = "termo" + rodada;
-    formulario.addEventListener("submit", (event) => {
+    formulario.autocomplete = "off";
+    formulario.noValidate = true;
+
+    // O tratamento explícito do submit e preventDefault impedem a navegação/reload.
+    formulario.onsubmit = (event) => {
         event.preventDefault();
-        verificar();
-    });
+        event.stopPropagation();
+        verificar(formulario);
+        return false;
+    };
 
     for (let i = 0; i < qtdLetras; i++) {
-        const caixa = document.createElement("input");
-        caixa.type = "text";
-        caixa.maxLength = 1;
-        caixa.name = "letra" + i;
-        caixa.autocomplete = "off";
-        caixa.inputMode = "text";
-        caixa.setAttribute("aria-label", "Letra " + (i + 1));
-        caixa.value = "";
-        caixa.style.textTransform = "uppercase";
-        caixa.addEventListener("input", () => {
-            caixa.value = caixa.value.toUpperCase().replace(/[^A-ZÀ-Ú]/g, "");
-            if (caixa.value && i < qtdLetras - 1) {
-                const proximo = formulario["letra" + (i + 1)];
-                if (proximo) proximo.focus();
+        const campo = document.createElement("input");
+        campo.type = "text";
+        campo.name = "letra" + i;
+        campo.maxLength = 1;
+        campo.autocomplete = "off";
+        campo.setAttribute("aria-label", "Letra " + (i + 1));
+        campo.inputMode = "text";
+        campo.required = true;
+        campo.addEventListener("input", () => {
+            campo.value = campo.value.toLocaleUpperCase("pt-BR").replace(/[^A-ZÁÉÍÓÚÂÊÔÃÕÇ]/g, "");
+            if (campo.value && i < qtdLetras - 1) {
+                formulario.elements["letra" + (i + 1)].focus();
             }
         });
-        formulario.appendChild(caixa);
+        campo.addEventListener("keydown", (event) => {
+            if (event.key === "Backspace" && !campo.value && i > 0) {
+                formulario.elements["letra" + (i - 1)].focus();
+            }
+        });
+        formulario.appendChild(campo);
     }
 
-    const botao = document.createElement("input");
+    const botao = document.createElement("button");
     botao.type = "submit";
-    botao.value = "Enviar";
+    botao.textContent = "Enviar";
     formulario.appendChild(botao);
-
     jogo.appendChild(formulario);
 
-    const primeiroCampo = formulario.querySelector("input[type='text']");
-    if (primeiroCampo) {
-        primeiroCampo.focus();
-    }
+    const primeiroCampo = formulario.querySelector('input[type="text"]');
+    if (primeiroCampo) primeiroCampo.focus();
 }
 
 iniciar();
