@@ -146,6 +146,39 @@
                 inset 0 -3px 5px rgba(75,89,101,.2);
         }
 
+        /* A lógica do jogo define as cores inline; estes estilos preservam os tons
+           semânticos, aplicando acabamento metálico para cada resultado. */
+        #jogo input[type="text"][style*="green"],
+        #jogo input[type="text"][style*="green"]:focus {
+            border-color: rgba(255,255,255,.98);
+            background:
+                linear-gradient(155deg, rgba(255,255,255,.8) 0%, rgba(255,255,255,.16) 42%, transparent 43%),
+                linear-gradient(180deg, #a9ed9a 0%, #58c96a 48%, #29984e 100%) !important;
+            box-shadow: 0 5px 10px rgba(30,125,65,.2), inset 0 2px 3px rgba(255,255,255,.95), inset 0 -3px 5px rgba(25,92,48,.28);
+            color: #124a2a;
+        }
+
+        #jogo input[type="text"][style*="yellow"],
+        #jogo input[type="text"][style*="yellow"]:focus {
+            border-color: rgba(255,255,255,.98);
+            background:
+                linear-gradient(155deg, rgba(255,255,255,.84) 0%, rgba(255,255,255,.18) 42%, transparent 43%),
+                linear-gradient(180deg, #fff2a6 0%, #f6d54d 48%, #d9a921 100%) !important;
+            box-shadow: 0 5px 10px rgba(157,122,22,.2), inset 0 2px 3px rgba(255,255,255,.95), inset 0 -3px 5px rgba(128,91,12,.25);
+            color: #60470d;
+        }
+
+        /* O jogo marca as letras incorretas como gray; a apresentação é vermelha. */
+        #jogo input[type="text"][style*="gray"],
+        #jogo input[type="text"][style*="gray"]:focus {
+            border-color: rgba(255,255,255,.98);
+            background:
+                linear-gradient(155deg, rgba(255,255,255,.8) 0%, rgba(255,255,255,.16) 42%, transparent 43%),
+                linear-gradient(180deg, #f3a0a0 0%, #df6268 48%, #b93848 100%) !important;
+            box-shadow: 0 5px 10px rgba(157,48,57,.2), inset 0 2px 3px rgba(255,255,255,.95), inset 0 -3px 5px rgba(119,31,43,.27);
+            color: #641f2a;
+        }
+
         #jogo input[type="submit"] {
             min-height: 48px;
             padding: 0 20px;
